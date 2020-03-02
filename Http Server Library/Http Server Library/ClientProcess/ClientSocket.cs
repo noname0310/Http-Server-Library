@@ -9,7 +9,7 @@ namespace HttpServerLibrary
 {
     class ClientSocket
     {
-        public delegate string ClientEndReceive(string ReceivedData);
+        public delegate string ClientEndReceive(byte[] ReceivedData);
         public event ClientEndReceive OnClientEndReceive;
 
         private int PacketSize;
@@ -34,7 +34,7 @@ namespace HttpServerLibrary
         {
             int receivedByte = Client.EndReceive(ar);
 
-            string content = OnClientEndReceive?.Invoke(Encoding.UTF8.GetString(Buffer));
+            string content = OnClientEndReceive?.Invoke(Buffer);
 
             byte[] contentBuffer = Encoding.UTF8.GetBytes(content);
             byte[] SendBuffer = new byte[Header.Length + contentBuffer.Length];
@@ -42,6 +42,8 @@ namespace HttpServerLibrary
             System.Buffer.BlockCopy(contentBuffer, 0, SendBuffer, Header.Length, contentBuffer.Length);
 
             Client.Send(SendBuffer);
+
+            Console.WriteLine("received!!!!!!!!!!!!!!!!!!!!");
 
             Client.Close();
             Client.Dispose();

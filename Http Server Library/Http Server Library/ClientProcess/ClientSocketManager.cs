@@ -30,45 +30,50 @@ namespace HttpServerLibrary
             clientSocket.Process();
         }
 
-        private string ClientSocket_OnClientEndReceive(string ReceivedData)
+        private string ClientSocket_OnClientEndReceive(byte[] ReceivedData)
         {
             RequestType requestType;
             string parameter = null;
             string content = null;
-            Console.WriteLine(ReceivedData);
+            Console.WriteLine(Encoding.UTF8.GetString(ReceivedData).Replace('\r', 'r').Replace('\n', 'n'));
 
             int startindex;
-            switch (ReceivedData.Substring(0, 2))
+            switch (ReceivedData[0])
             {
-                case "GE":
+                case (byte)'G':
                     requestType = RequestType.GET;
                     startindex = 5;
                     break;
 
-                case "PO":
-                    requestType = RequestType.POST;
-                    startindex = 6;
+                case (byte)'P':
+
+                    if (ReceivedData[1] == (byte)'O')
+                    {
+                        requestType = RequestType.POST;
+                        startindex = 6;
+                    }
+                    else
+                    {
+                        requestType = RequestType.PUT;
+                        startindex = 5;
+                    }
                     break;
 
-                case "DE":
+                case (byte)'D':
                     requestType = RequestType.DELETE;
                     startindex = 7;
                     break;
 
-                case "PU":
-                    requestType = RequestType.PUT;
-                    startindex = 5;
-                    break;
-
                 default:
-                    goto case "GE";
+                    goto case (byte)'G';
             }
 
             int index = startindex;
-            while (ReceivedData[index] != ' ')
+            string ReceivedString = Encoding.UTF8.GetString(ReceivedData);
+            while (ReceivedString[index] != ' ')
                 index++;
 
-            parameter = ReceivedData.Substring(startindex, index - startindex);
+            parameter = ReceivedString.Substring(startindex, index - startindex);
 
             return OnClientRequest?.Invoke(requestType, parameter, content);
         }
