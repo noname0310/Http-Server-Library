@@ -1,6 +1,7 @@
-﻿using HttpServerLibrary;
+﻿using System;
 using System.Net;
 using System.Threading;
+using HttpServerLibrary;
 
 namespace CodeTestApp
 {
@@ -21,14 +22,7 @@ namespace CodeTestApp
 
         private static string HttpServer_OnClientRequest(RequestType requestType, string parameter, string content)
         {
-            if (requestType == RequestType.GET)
-            {
-                return "GET!";
-            }
-            else
-            {
-                return "OK";
-            }
+            return string.Format("RequestType: {0} parameter: {1} content: {2}", requestType.ToString(), parameter, content);
         }
     }
 }

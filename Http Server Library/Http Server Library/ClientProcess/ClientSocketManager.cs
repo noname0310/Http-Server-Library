@@ -33,10 +33,43 @@ namespace HttpServerLibrary
         private string ClientSocket_OnClientEndReceive(string ReceivedData)
         {
             RequestType requestType;
-            string parameter;
-            string content;
-
+            string parameter = null;
+            string content = null;
             Console.WriteLine(ReceivedData);
+
+            int startindex;
+            switch (ReceivedData.Substring(0, 2))
+            {
+                case "GE":
+                    requestType = RequestType.GET;
+                    startindex = 5;
+                    break;
+
+                case "PO":
+                    requestType = RequestType.POST;
+                    startindex = 6;
+                    break;
+
+                case "DE":
+                    requestType = RequestType.DELETE;
+                    startindex = 7;
+                    break;
+
+                case "PU":
+                    requestType = RequestType.PUT;
+                    startindex = 5;
+                    break;
+
+                default:
+                    goto case "GE";
+            }
+
+            int index = startindex;
+            while (ReceivedData[index] != ' ')
+                index++;
+
+            parameter = ReceivedData.Substring(startindex, index - startindex);
+
             return OnClientRequest?.Invoke(requestType, parameter, content);
         }
     }

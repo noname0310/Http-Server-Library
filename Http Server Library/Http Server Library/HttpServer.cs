@@ -14,17 +14,17 @@ namespace HttpServerLibrary
 
         private CountdownEvent CountdownEvent;
 
-        private const int PACKET_SIZE = 1024 * 4;
-        private SocketListener SocketListener;
+        private const int PACKET_SIZE = 1024 * 10;
         private IPEndPoint IPEndPoint;
+        private SocketListener SocketListener;
         private ClientSocketManager ClientSocketManager;
 
         public HttpServer(IPEndPoint endPoint)
         {
             Socket = null;
 
-            SocketListener = new SocketListener();
             IPEndPoint = endPoint;
+            SocketListener = new SocketListener();
             ClientSocketManager = new ClientSocketManager(PACKET_SIZE);
 
             SocketListener.OnClientConnected += SocketListener_OnClientConnected;
@@ -39,6 +39,7 @@ namespace HttpServerLibrary
         ~HttpServer()
         {
             SocketListener.OnClientConnected -= SocketListener_OnClientConnected;
+            ClientSocketManager.OnClientRequest -= ClientSocketManager_OnClientRequest;
         }
 
         public void Start()
@@ -54,10 +55,8 @@ namespace HttpServerLibrary
             CountdownEvent.Signal();
         }
 
-        private void SocketListener_OnClientConnected(Socket ClientSocket)
-        {
-            ClientSocketManager.ClientProcess(ClientSocket);
-        }
+        private void SocketListener_OnClientConnected(Socket ClientSocket) => ClientSocketManager.ClientProcess(ClientSocket);
+
         private string ClientSocketManager_OnClientRequest(RequestType requestType, string parameter, string content)
         {
             return OnClientRequest?.Invoke(requestType, parameter, content);
