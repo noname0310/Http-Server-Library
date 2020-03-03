@@ -22,6 +22,7 @@ namespace CodeTestApp
 
         private static string HttpServer_OnClientRequest(RequestType requestType, string parameter, string content)
         {
+            Console.WriteLine(string.Format("RequestType: {0} parameter: {1} content: {2}", requestType.ToString(), parameter, content));
             return string.Format("RequestType: {0} parameter: {1} content: {2}", requestType.ToString(), parameter, content);
         }
     }
