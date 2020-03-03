@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -14,7 +13,7 @@ namespace HttpServerLibrary
 
         private CountdownEvent CountdownEvent;
 
-        private const int PACKET_SIZE = 1024 * 10;
+        private const int PACKET_SIZE = 1024 * 2;
         private IPEndPoint IPEndPoint;
         private SocketListener SocketListener;
         private ClientSocketManager ClientSocketManager;
@@ -61,13 +60,5 @@ namespace HttpServerLibrary
         {
             return OnClientRequest?.Invoke(requestType, parameter, content);
         }
-    }
-
-    public enum RequestType
-    {
-        GET,
-        POST,
-        PUT,
-        DELETE
     }
 }

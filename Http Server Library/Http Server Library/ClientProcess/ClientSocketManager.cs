@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 
@@ -27,55 +26,33 @@ namespace HttpServerLibrary
         {
             ClientSocket clientSocket = new ClientSocket(PacketSize, Header, Client);
             clientSocket.OnClientEndReceive += ClientSocket_OnClientEndReceive;
-            clientSocket.Process();
+            clientSocket.StartProcess();
         }
 
-        private string ClientSocket_OnClientEndReceive(byte[] ReceivedData)
+        private string ClientSocket_OnClientEndReceive(byte[] ReceivedData, ParseResult parseResult)
         {
-            RequestType requestType;
-            string parameter = null;
-            string content = null;
-            Console.WriteLine(Encoding.UTF8.GetString(ReceivedData).Replace('\r', 'r').Replace('\n', 'n'));
+            string content;
+            string parameter;
 
-            int startindex;
-            switch (ReceivedData[0])
+            if (parseResult.ContentLength == 0)
+                content = "";
+            else
             {
-                case (byte)'G':
-                    requestType = RequestType.GET;
-                    startindex = 5;
-                    break;
-
-                case (byte)'P':
-
-                    if (ReceivedData[1] == (byte)'O')
-                    {
-                        requestType = RequestType.POST;
-                        startindex = 6;
-                    }
-                    else
-                    {
-                        requestType = RequestType.PUT;
-                        startindex = 5;
-                    }
-                    break;
-
-                case (byte)'D':
-                    requestType = RequestType.DELETE;
-                    startindex = 7;
-                    break;
-
-                default:
-                    goto case (byte)'G';
+                byte[] contentByte = new byte[parseResult.ContentLength];
+                Buffer.BlockCopy(ReceivedData, parseResult.ContentRange.StartIndex, contentByte, 0, contentByte.Length);
+                content = Encoding.UTF8.GetString(contentByte);
             }
 
-            int index = startindex;
-            string ReceivedString = Encoding.UTF8.GetString(ReceivedData);
-            while (ReceivedString[index] != ' ')
-                index++;
+            if (parseResult.ParameterRange.EndIndex - parseResult.ParameterRange.StartIndex <= 0)
+                parameter = "";
+            else
+            {
+                byte[] parameterByte = new byte[parseResult.ParameterRange.EndIndex - parseResult.ParameterRange.StartIndex + 1];
+                Buffer.BlockCopy(ReceivedData, parseResult.ParameterRange.StartIndex, parameterByte, 0, parameterByte.Length);
+                parameter = Encoding.UTF8.GetString(parameterByte);
+            }
 
-            parameter = ReceivedString.Substring(startindex, index - startindex);
-
-            return OnClientRequest?.Invoke(requestType, parameter, content);
+            return OnClientRequest?.Invoke(parseResult.RequestType, parameter, content);
         }
     }
 }
