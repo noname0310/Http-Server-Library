@@ -69,27 +69,6 @@ namespace HttpServerLibrary
             return parseResult;
         }
 
-        public static int SearchString(byte[] buffer, int startIndex, string target)
-        {
-            int targetcharindex = 0;
-
-            for (int i = startIndex; i < buffer.Length; i++)
-            {
-                if (buffer[i] == target[targetcharindex])
-                {
-                    targetcharindex++;
-                    if (targetcharindex == target.Length)
-                    {
-                        return i - target.Length + 1;
-                    }
-                }
-                else
-                    targetcharindex = 0;
-            }
-
-            return -1;
-        }
-
         public static int SearchString(byte[] buffer, int startIndex, int endIndex, string target)
         {
             int targetcharindex = 0;

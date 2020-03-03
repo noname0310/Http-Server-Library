@@ -90,8 +90,6 @@ namespace HttpServerLibrary
 
             Client.Send(SendBuffer);
 
-            Console.WriteLine("received!!!!!!!!!!!!!!!!!!!!");
-
             Client.Close();
             Client.Dispose();
         }
