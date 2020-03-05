@@ -40,7 +40,7 @@ namespace HttpServerLibrary
             for (int i = 0; i < Buffer.Length; i++)
                 Buffer[i] = 0;
 
-            Client.BeginReceive(Buffer, 0, ReceiveLength, SocketFlags.None, Receivecallback, Client);
+            Client.BeginReceive(Buffer, 0, (Buffer.Length < ReceiveLength) ? Buffer.Length : ReceiveLength, SocketFlags.None, Receivecallback, Client);
         }
 
         private void Receivecallback(IAsyncResult ar)
