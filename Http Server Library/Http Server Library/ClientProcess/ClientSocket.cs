@@ -88,10 +88,17 @@ namespace HttpServerLibrary
             System.Buffer.BlockCopy(Header, 0, SendBuffer, 0, Header.Length);
             System.Buffer.BlockCopy(ContentBuffer, 0, SendBuffer, Header.Length, ContentBuffer.Length);
 
-            Client.Send(SendBuffer);
+            try
+            {
+                Client.Send(SendBuffer);
+            }
+            catch (SocketException)
+            {
 
-            Client.Close();
-            Client.Dispose();
+                //Client SocketException catched
+            }
+            Client?.Close();
+            Client?.Dispose();
         }
     }
 }
