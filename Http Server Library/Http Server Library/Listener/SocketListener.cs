@@ -31,11 +31,19 @@ namespace HttpServerLibrary
 
         private void AcceptCallback(IAsyncResult ar)
         {
-            Socket clientSocket = Socket.EndAccept(ar);
+            Socket clientSocket;
+            try
+            {
+                clientSocket = Socket.EndAccept(ar);
+                Socket.BeginAccept(AcceptCallback, null);
+            }
+            catch (SocketException)
+            {
+                return;
+            }
 
             OnClientConnected?.Invoke(clientSocket);
 
-            Socket.BeginAccept(AcceptCallback, null);
         }
 
         public void Stop()

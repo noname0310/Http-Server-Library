@@ -46,6 +46,19 @@ namespace HttpServerLibrary
         private void Receivecallback(IAsyncResult ar)
         {
             int receivedByte = Client.EndReceive(ar);
+            if (receivedByte == 0)
+            {
+                try
+                {
+                    if (Client.Connected)
+                        Client.Shutdown(SocketShutdown.Both);
+                    Client.Close();
+                    Client.Dispose();
+                }
+                catch
+                {
+                }
+            }
 
             if (FirstTime)
             {
@@ -91,14 +104,14 @@ namespace HttpServerLibrary
             try
             {
                 Client.Send(SendBuffer);
+                if (Client.Connected)
+                    Client.Shutdown(SocketShutdown.Both);
+                Client.Close();
+                Client.Dispose();
             }
-            catch (SocketException)
+            catch 
             {
-
-                //Client SocketException catched
             }
-            Client?.Close();
-            Client?.Dispose();
         }
     }
 }
